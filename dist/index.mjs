@@ -31837,19 +31837,6 @@ async function main() {
 
   const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
 
-  if (
-    (eventName === "pull_request" || eventName === "pull_request_target") &&
-    action === "synchronize"
-  ) {
-    console.log(`Adding ${targetLogin} as a reviewer...`);
-    await octokit.rest.pulls.requestReviewers({
-      owner,
-      repo,
-      pull_number: pullRequestNumber,
-      reviewers: [targetLogin],
-    });
-  }
-
   let exitCode = 0;
   if (
     await isPendingReview(octokit, owner, repo, pullRequestNumber, targetLogin)
