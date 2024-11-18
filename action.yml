@@ -17,4 +17,4 @@ inputs:
     default: "copilot-pull-request-reviewer"
 runs:
   using: "node20"
-  main: "dist/check.mjs"
+  main: "dist/index.mjs"
