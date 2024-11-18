@@ -53,6 +53,7 @@ async function fetchReviewComments(token, owner, repo, pullRequestNumber) {
 /**
  * Check unresolved comments by a specific author in a pull request.
  *
+ * @param {string} token GitHub token
  * @param {string} owner Repository owner
  * @param {string} repo Repository name
  * @param {number} pullRequestNumber Pull request number
@@ -60,6 +61,7 @@ async function fetchReviewComments(token, owner, repo, pullRequestNumber) {
  * @returns {Promise<void>}
  */
 async function checkUnresolvedComments(
+  token,
   owner,
   repo,
   pullRequestNumber,
