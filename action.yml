@@ -6,6 +6,7 @@ branding:
 inputs:
   token:
     description: "GitHub token"
+    default: ${{ github.token }}
   owner:
     description: "Repository owner"
   repo:
