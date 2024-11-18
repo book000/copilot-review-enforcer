@@ -14,7 +14,7 @@ inputs:
     description: "Pull request number"
   target_login:
     description: "GitHub login of the target user"
-    default: "copilot-pull-request-reviewer"
+    default: "copilot-pull-request-reviewer[bot]"
 runs:
   using: "node20"
   main: "dist/index.mjs"
