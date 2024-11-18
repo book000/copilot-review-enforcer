@@ -68,6 +68,7 @@ async function checkUnresolvedComments(
   const data = await fetchReviewComments(owner, repo, pullRequestNumber);
 
   const reviewThreads = data.repository.pullRequest.reviewThreads.nodes;
+  console.log("Review threads:", reviewThreads);
 
   // Filter unresolved comments by the target author
   const unresolvedComments = reviewThreads.filter(
@@ -82,10 +83,10 @@ async function checkUnresolvedComments(
     console.error(
       `Found ${unresolvedComments.length} unresolved comments by ${targetLogin}.`
     );
-    process.exit(1); // Abnormal termination
+    return false;
   } else {
     console.log(`All comments by ${targetLogin} are resolved.`);
-    process.exit(0); // Normal termination
+    return true;
   }
 }
 
@@ -102,6 +103,7 @@ async function isPendingReview(
     repo,
     pull_number: pullRequestNumber,
   });
+  console.log("listReviews:", reviews.data);
 
   const reviewed = reviews.data.some(
     (review) => review.user.login === targetLogin && review.state === "PENDING"
@@ -139,7 +141,8 @@ async function main() {
     console.error(
       `Missing required inputs: ${missing.map(([key]) => key).join(", ")}`
     );
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 
   if (eventName === "pull_request" && action === "synchronize") {
@@ -151,22 +154,25 @@ async function main() {
       pull_number: pullRequestNumber,
       reviewers: [targetLogin],
     });
-    return;
   }
 
+  let exitCode = 0;
   if (isPendingReview(token, owner, repo, pullRequestNumber, targetLogin)) {
     console.log(`Pull request is pending review by ${targetLogin}.`);
-    process.exit(0);
+    exitCode = 1;
   }
 
   console.log("Checking unresolved comments...");
-  await checkUnresolvedComments(
+  const result = await checkUnresolvedComments(
     token,
     owner,
     repo,
     pullRequestNumber,
     targetLogin
   );
+  exitCode = result ? exitCode : 1;
+
+  process.exitCode = exitCode;
 }
 
 (async () => {
