@@ -166,7 +166,10 @@ async function main() {
 
   const octokit = github.getOctokit(token);
 
-  if (eventName === "pull_request" && action === "synchronize") {
+  if (
+    (eventName === "pull_request" || eventName === "pull_request_target") &&
+    action === "synchronize"
+  ) {
     console.log(`Adding ${targetLogin} as a reviewer...`);
     await octokit.rest.pulls.requestReviewers({
       owner,
