@@ -134,11 +134,15 @@ async function main() {
   const eventName = github.context.eventName;
   const action = github.context.payload.action;
 
-  const token = inputToken || process.env.GITHUB_TOKEN;
-  const owner = inputOwner || github.context.repo.owner;
-  const repo = inputRepo || github.context.repo.repo;
-  const pullRequestNumber =
-    inputPullRequestNumber || github.context.payload.pull_request.number;
+  const token = inputToken !== "" ? inputToken : process.env.GITHUB_TOKEN;
+  const owner = inputOwner !== "" ? inputOwner : github.context.repo.owner;
+  const repo = inputRepo !== "" ? inputRepo : github.context.repo.repo;
+  const pullRequestNumber = parseInt(
+    inputPullRequestNumber !== ""
+      ? inputPullRequestNumber
+      : github.context.issue.number,
+    10
+  );
 
   console.log("Inputs:", { owner, repo, pullRequestNumber, targetLogin });
   console.log("Event:", { eventName, action });

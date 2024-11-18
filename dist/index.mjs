@@ -31805,11 +31805,15 @@ async function main() {
   const eventName = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.eventName;
   const action = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.action;
 
-  const token = inputToken || process.env.GITHUB_TOKEN;
-  const owner = inputOwner || _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner;
-  const repo = inputRepo || _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo;
-  const pullRequestNumber =
-    inputPullRequestNumber || _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request.number;
+  const token = inputToken !== "" ? inputToken : process.env.GITHUB_TOKEN;
+  const owner = inputOwner !== "" ? inputOwner : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner;
+  const repo = inputRepo !== "" ? inputRepo : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo;
+  const pullRequestNumber = parseInt(
+    inputPullRequestNumber !== ""
+      ? inputPullRequestNumber
+      : _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue.number,
+    10
+  );
 
   console.log("Inputs:", { owner, repo, pullRequestNumber, targetLogin });
   console.log("Event:", { eventName, action });
