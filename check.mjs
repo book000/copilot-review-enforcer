@@ -111,7 +111,7 @@ async function isPendingReview(
   pullRequestNumber,
   targetLogin
 ) {
-  const reviews = await octokit.pulls.listReviews({
+  const reviews = await octokit.rest.pulls.listReviews({
     owner,
     repo,
     pull_number: pullRequestNumber,
