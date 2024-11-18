@@ -1,5 +1,7 @@
 name: "Check Unresolved Comments"
 description: "Check for unresolved comments by a specific user in a pull request"
+icon: "eye"
+color: "yellow"
 inputs:
   token:
     description: "GitHub token"
