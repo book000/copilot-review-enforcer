@@ -1,0 +1,32 @@
+name: "Test Check Unresolved Comments"
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+  pull_request_review_comment:
+    types: [created, edited, deleted]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run check.mjs
+        uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          pull_request_number: ${{ github.event.pull_request.number }}
+          target_login: "copilot-pull-request-reviewer"

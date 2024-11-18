@@ -1,0 +1,17 @@
+name: "Check Unresolved Comments"
+description: "Check for unresolved comments by a specific user in a pull request"
+inputs:
+  token:
+    description: "GitHub token"
+  owner:
+    description: "Repository owner"
+  repo:
+    description: "Repository name"
+  pull_request_number:
+    description: "Pull request number"
+  target_login:
+    description: "GitHub login of the target user"
+    default: "copilot-pull-request-reviewer"
+runs:
+  using: "node20"
+  main: "check.mjs"
