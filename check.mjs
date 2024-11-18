@@ -79,7 +79,9 @@ async function checkUnresolvedComments(
     (thread) =>
       !thread.isResolved &&
       thread.comments.nodes.some(
-        (comment) => comment.author.login === targetLogin
+        (comment) =>
+          comment.author.login === targetLogin ||
+          comment.author.login === targetLogin.replace("[bot]", "")
       )
   );
 
