@@ -1,17 +1,16 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { graphql } from "@octokit/graphql";
 
 /**
  * Fetch review comments from a pull request.
  *
- * @param {string} token GitHub token
+ * @param {Octokit} octokit Octokit instance
  * @param {string} owner Repository owner
  * @param {string} repo Repository name
  * @param {number} pullRequestNumber Pull request number
  * @returns {Promise<object>} GraphQL response data
  */
-async function fetchReviewComments(token, owner, repo, pullRequestNumber) {
+async function fetchReviewComments(octokit, owner, repo, pullRequestNumber) {
   const query = `
     query FetchReviewComments($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
       repository(owner: $owner, name: $repo) {
@@ -34,13 +33,11 @@ async function fetchReviewComments(token, owner, repo, pullRequestNumber) {
   `;
 
   try {
-    const response = await graphql(query, {
+    const response = await octokit.graphql({
+      query,
       owner,
       repo,
       pullRequestNumber,
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
     });
 
     return response;
@@ -53,7 +50,7 @@ async function fetchReviewComments(token, owner, repo, pullRequestNumber) {
 /**
  * Check unresolved comments by a specific author in a pull request.
  *
- * @param {string} token GitHub token
+ * @param {Octokit} octokit Octokit instance
  * @param {string} owner Repository owner
  * @param {string} repo Repository name
  * @param {number} pullRequestNumber Pull request number
@@ -61,13 +58,18 @@ async function fetchReviewComments(token, owner, repo, pullRequestNumber) {
  * @returns {Promise<void>}
  */
 async function checkUnresolvedComments(
-  token,
+  octokit,
   owner,
   repo,
   pullRequestNumber,
   targetLogin
 ) {
-  const data = await fetchReviewComments(token, owner, repo, pullRequestNumber);
+  const data = await fetchReviewComments(
+    octokit,
+    owner,
+    repo,
+    pullRequestNumber
+  );
 
   const reviewThreads = data.repository.pullRequest.reviewThreads.nodes;
   console.log("Review threads:", reviewThreads);
@@ -92,14 +94,23 @@ async function checkUnresolvedComments(
   }
 }
 
+/**
+ * Check if a pull request is pending review by a specific author.
+ *
+ * @param {Octokit} octokit Octokit instance
+ * @param {string} owner Repository owner
+ * @param {string} repo Repository name
+ * @param {number} pullRequestNumber Pull request number
+ * @param {string} targetLogin Target author login
+ * @returns {Promise<boolean>} Whether the pull request is pending review
+ */
 async function isPendingReview(
-  token,
+  octokit,
   owner,
   repo,
   pullRequestNumber,
   targetLogin
 ) {
-  const octokit = github.getOctokit(token);
   const reviews = await octokit.pulls.listReviews({
     owner,
     repo,
@@ -147,9 +158,10 @@ async function main() {
     return;
   }
 
+  const octokit = github.getOctokit(token);
+
   if (eventName === "pull_request" && action === "synchronize") {
     console.log(`Adding ${targetLogin} as a reviewer...`);
-    const octokit = github.getOctokit(token);
     await octokit.rest.pulls.requestReviewers({
       owner,
       repo,
@@ -159,14 +171,16 @@ async function main() {
   }
 
   let exitCode = 0;
-  if (isPendingReview(token, owner, repo, pullRequestNumber, targetLogin)) {
+  if (
+    await isPendingReview(octokit, owner, repo, pullRequestNumber, targetLogin)
+  ) {
     console.log(`Pull request is pending review by ${targetLogin}.`);
     exitCode = 1;
   }
 
   console.log("Checking unresolved comments...");
   const result = await checkUnresolvedComments(
-    token,
+    octokit,
     owner,
     repo,
     pullRequestNumber,
