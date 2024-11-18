@@ -32536,7 +32536,7 @@ async function main() {
   if (eventName === "pull_request" && action === "synchronize") {
     console.log(`Adding ${targetLogin} as a reviewer...`);
     const octokit = github.getOctokit(token);
-    await octokit.pulls.createReviewRequest({
+    await octokit.rest.pulls.requestReviewers({
       owner,
       repo,
       pull_number: pullRequestNumber,
