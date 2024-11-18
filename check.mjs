@@ -65,7 +65,7 @@ async function checkUnresolvedComments(
   pullRequestNumber,
   targetLogin
 ) {
-  const data = await fetchReviewComments(owner, repo, pullRequestNumber);
+  const data = await fetchReviewComments(token, owner, repo, pullRequestNumber);
 
   const reviewThreads = data.repository.pullRequest.reviewThreads.nodes;
   console.log("Review threads:", reviewThreads);
